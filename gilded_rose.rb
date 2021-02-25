@@ -20,25 +20,43 @@ Item = Struct.new(:name, :sell_in, :quality)
 #   Item.new("Backstage passes to a TAFKAL80ETC concert", 15, 20),
 #   Item.new("Conjured Mana Cake", 3, 6),
 # ]
+class NormalQuality
+  def initialize(item)
+    @item = item
+  end
+
+  def age
+    if @item.quality.positive?
+      @item.quality -= 1
+    end
+  end
+end
+
+class QualityFactory
+  def initialize(item)
+    @item = item
+  end
+
+  def create
+    NormalQuality.new(@item)
+  end
+end
+
 class Product
   def initialize(item)
     @item = item
   end
 
   def age
-    age_quality
+    update_quality
     reduce_age
     quality_after_expiration
   end
 
   private
 
-  def age_quality
-    update_quality
-  end
-
   def update_quality
-    @item.quality -= 1
+    QualityFactory.new(@item).create.age
   end
 
   def quality_after_expiration
@@ -51,9 +69,6 @@ class Product
 end
 
 class NormalProduct < Product
-  def update_quality
-    @item.quality -= 1 if @item.quality.positive?
-  end
 
   def reduce_age
     @item.sell_in -= 1
@@ -67,15 +82,22 @@ class NormalProduct < Product
 end
 
 class ProductFactory
+
   def create(item)
-    if normal_item?(item)
-      create_normal_item(item)
-    else
+    if !normal_item?(item)
       LegendaryProduct.new item
+    elsif conjured_item?(item)
+      ConjuredProduct.new item
+    else
+      create_normal_item(item)
     end
   end
 
   private
+
+  def conjured_item?(item)
+    item.name == 'Conjured Mana Cake'
+  end
 
   def create_normal_item(item)
     case item.name
@@ -171,4 +193,7 @@ class ConcertTickets < NormalProduct
   def concert_imminent?
     @item.sell_in < 6
   end
+end
+
+class ConjuredProduct < NormalProduct
 end
