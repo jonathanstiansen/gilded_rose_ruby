@@ -47,6 +47,16 @@ class BrieQuality
 
 end
 
+class ExpiredConcertTicketQuality
+  def initialize(item)
+    @item = item
+  end
+
+  def age
+    @item.quality = 0
+  end
+end
+
 class QualityFactory
   def initialize(item)
     @item = item
@@ -56,6 +66,8 @@ class QualityFactory
     case @item.name
     when 'Aged Brie'
       BrieQuality.new(@item)
+    when 'Backstage passes to a TAFKAL80ETC concert'
+      ExpiredConcertTicketQuality.new(@item)
     else
       NormalQuality.new(@item)
     end
@@ -182,7 +194,7 @@ end
 class ConcertTickets < NormalProduct
   def update_quality
     if expired?
-      @item.quality = 0
+      QualityFactory.new(@item).create.age
     elsif under_max_quality?
       DemandFactory.new(@item).create.update_quality
     end
