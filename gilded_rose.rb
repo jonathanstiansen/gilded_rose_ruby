@@ -32,19 +32,40 @@ class NormalQuality
   end
 end
 
+class BrieQuality
+  def initialize(item)
+    @item = item
+  end
+
+  def age
+    @item.quality += 1 if under_max_quality?
+  end
+
+  def under_max_quality?
+    @item.quality < 50
+  end
+
+end
+
 class QualityFactory
   def initialize(item)
     @item = item
   end
 
   def create
-    NormalQuality.new(@item)
+    case @item.name
+    when 'Aged Brie'
+      BrieQuality.new(@item)
+    else
+      NormalQuality.new(@item)
+    end
   end
 end
 
 class Product
   def initialize(item)
     @item = item
+    @quality = QualityFactory.new(item).create
   end
 
   def age
@@ -56,7 +77,7 @@ class Product
   private
 
   def update_quality
-    QualityFactory.new(@item).create.age
+    @quality.age
   end
 
   def quality_after_expiration
@@ -72,12 +93,6 @@ class NormalProduct < Product
 
   def reduce_age
     @item.sell_in -= 1
-  end
-
-  private
-
-  def under_max_quality?
-    @item.quality < 50
   end
 end
 
@@ -98,8 +113,6 @@ class ProductFactory
 
   def create_normal_item(item)
     case item.name
-    when 'Aged Brie'
-      Brie.new item
     when 'Backstage passes to a TAFKAL80ETC concert'
       ConcertTickets.new item
     else
@@ -109,12 +122,6 @@ class ProductFactory
 
   def normal_item?(item)
     item.name != 'Sulfuras, Hand of Ragnaros'
-  end
-end
-
-class Brie < NormalProduct
-  def update_quality
-    @item.quality += 1 if under_max_quality?
   end
 end
 
@@ -182,6 +189,10 @@ class ConcertTickets < NormalProduct
   end
 
   private
+
+  def under_max_quality?
+    @item.quality < 50
+  end
 
   def getting_closer?
     @item.sell_in < 11
