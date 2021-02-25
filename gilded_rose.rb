@@ -33,9 +33,7 @@ class Product
 
   def age
     if @item.name != 'Aged Brie' && @item.name != 'Backstage passes to a TAFKAL80ETC concert'
-      if @item.quality.positive?
-          age_quality
-      end
+      age_quality
     else
       if @item.quality < 50
         @item.quality += 1
@@ -53,20 +51,20 @@ class Product
         end
       end
     end
-    if normal_item?(@item)
-      @item.sell_in -= 1
-    end
-    expired = @item.sell_in < 0
-    if expired
+
+    reduce_age
+    quality_after_expiration
+  end
+
+  private
+
+  def quality_after_expiration
+    if @item.sell_in.negative?
       if @item.name != "Aged Brie"
         if @item.name != 'Backstage passes to a TAFKAL80ETC concert'
-          if @item.quality > 0
-            if normal_item?(@item)
-              @item.quality -= 1
-            end
-          end
+          age_quality
         else
-          @item.quality = @item.quality - @item.quality
+          @item.quality = 0
         end
       else
         if @item.quality < 50
@@ -79,7 +77,13 @@ end
 
 class NormalProduct < Product
   def age_quality
-    @item.quality -= 1
+    if @item.quality.positive?
+      @item.quality -= 1
+    end
+  end
+
+  def reduce_age
+    @item.sell_in -= 1
   end
 end
 
@@ -93,6 +97,7 @@ class ProductFactory
   end
 
   private
+
   def normal_item?(item)
     item.name != 'Sulfuras, Hand of Ragnaros'
   end
@@ -100,5 +105,8 @@ end
 
 class LegendaryProduct < Product
   def age_quality
+  end
+
+  def reduce_age
   end
 end
