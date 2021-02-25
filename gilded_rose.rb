@@ -97,7 +97,6 @@ class ProductFactory
   end
 
   private
-
   def normal_item?(item)
     item.name != 'Sulfuras, Hand of Ragnaros'
   end
@@ -106,7 +105,6 @@ end
 class LegendaryProduct < Product
   def age_quality
   end
-
   def reduce_age
   end
 end
