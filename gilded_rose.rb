@@ -128,11 +128,11 @@ class DemandFactory
 end
 
 class ConcertTickets < NormalProduct
-  def update_quality(demand: NormalDemand)
+  def update_quality
     if expired?
       @item.quality = 0
     elsif under_max_quality?
-      demand.new(@item).update_quality
+      DemandFactory.new.create(@item).update_quality
       if getting_closer?
         @item.quality += 1
       end
