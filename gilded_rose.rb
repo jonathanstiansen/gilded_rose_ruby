@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def update_quality(items)
   items.each do |item|
     ProductFactory.new.create(item).age
@@ -40,9 +42,7 @@ class Product
   end
 
   def quality_after_expiration
-    if expired?
-      update_quality
-    end
+    update_quality if expired?
   end
 
   def expired?
@@ -52,9 +52,7 @@ end
 
 class NormalProduct < Product
   def update_quality
-    if @item.quality.positive?
-      @item.quality -= 1
-    end
+    @item.quality -= 1 if @item.quality.positive?
   end
 
   def reduce_age
@@ -97,18 +95,14 @@ end
 
 class Brie < NormalProduct
   def update_quality
-    if under_max_quality?
-      @item.quality += 1
-    end
+    @item.quality += 1 if under_max_quality?
   end
 end
 
 class LegendaryProduct < Product
-  def update_quality
-  end
+  def update_quality; end
 
-  def reduce_age
-  end
+  def reduce_age; end
 end
 
 class NormalDemand
@@ -125,7 +119,6 @@ class RisingDemand < NormalDemand
   def update_quality
     @item.quality += 2
   end
-
 end
 
 class ImminentDemand < NormalDemand
@@ -158,7 +151,6 @@ class DemandFactory
   def concert_imminent?
     @item.sell_in < 6
   end
-
 end
 
 class ConcertTickets < NormalProduct
