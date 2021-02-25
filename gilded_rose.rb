@@ -121,10 +121,44 @@ class NormalDemand
   end
 end
 
-class DemandFactory
-  def create(item)
-    NormalDemand.new(item)
+class RisingDemand < NormalDemand
+  def update_quality
+    @item.quality += 2
   end
+
+end
+
+class ImminentDemand < NormalDemand
+  def update_quality
+    @item.quality += 3
+  end
+end
+
+class DemandFactory
+  def initialize(item)
+    @item = item
+  end
+
+  def create
+    if concert_imminent?
+      ImminentDemand.new(@item)
+    elsif getting_closer?
+      RisingDemand.new(@item)
+    else
+      NormalDemand.new(@item)
+    end
+  end
+
+  private
+
+  def getting_closer?
+    @item.sell_in < 11
+  end
+
+  def concert_imminent?
+    @item.sell_in < 6
+  end
+
 end
 
 class ConcertTickets < NormalProduct
@@ -132,13 +166,7 @@ class ConcertTickets < NormalProduct
     if expired?
       @item.quality = 0
     elsif under_max_quality?
-      DemandFactory.new.create(@item).update_quality
-      if getting_closer?
-        @item.quality += 1
-      end
-      if concert_imminent?
-        @item.quality += 1
-      end
+      DemandFactory.new(@item).create.update_quality
     end
   end
 
