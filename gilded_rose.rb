@@ -124,27 +124,26 @@ class NormalDemand
   end
 end
 
+class DemandFactory
+  def create(item) end
+end
+
 class ConcertTickets < NormalProduct
-  def update_quality demand: NormalDemand
+  def update_quality(demand: NormalDemand)
     if expired?
       @item.quality = 0
     elsif under_max_quality?
       demand.new(@item).update_quality
-      add_demand_value
+      if getting_closer?
+        @item.quality += 1
+      end
+      if concert_imminent?
+        @item.quality += 1
+      end
     end
   end
 
   private
-
-  # Probably should make this an object of Demand Pricing - HighDemand and RisingDemand
-  def add_demand_value
-    if getting_closer?
-      @item.quality += 1
-    end
-    if concert_imminent?
-      @item.quality += 1
-    end
-  end
 
   def getting_closer?
     @item.sell_in < 11
