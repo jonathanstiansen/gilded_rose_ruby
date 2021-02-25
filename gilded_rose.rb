@@ -57,6 +57,18 @@ class ExpiredConcertTicketQuality
   end
 end
 
+class ConjuredQuality
+  def initialize(item)
+    @item = item
+  end
+
+  def age
+    if @item.quality.positive?
+      @item.quality -= 2
+    end
+  end
+end
+
 class QualityFactory
   def initialize(item)
     @item = item
@@ -68,6 +80,8 @@ class QualityFactory
       BrieQuality.new(@item)
     when 'Backstage passes to a TAFKAL80ETC concert'
       ExpiredConcertTicketQuality.new(@item)
+    when 'Conjured Mana Cake'
+      ConjuredQuality.new(@item)
     else
       NormalQuality.new(@item)
     end
