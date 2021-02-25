@@ -36,25 +36,7 @@ class Product
   private
 
   def age_quality
-    if @item.name != 'Aged Brie' && @item.name != 'Backstage passes to a TAFKAL80ETC concert'
-      update_quality
-    else
-      if @item.quality < 50
-        @item.quality += 1
-        if @item.name == 'Backstage passes to a TAFKAL80ETC concert'
-          if @item.sell_in < 11
-            if @item.quality < 50
-              @item.quality += 1
-            end
-          end
-          if @item.sell_in < 6
-            if @item.quality < 50
-              @item.quality += 1
-            end
-          end
-        end
-      end
-    end
+    update_quality
   end
 
   def update_quality
@@ -63,13 +45,7 @@ class Product
 
   def quality_after_expiration
     if expired?
-      if @item.name != "Aged Brie"
-        update_quality
-      else
-        if @item.quality < 50
-          @item.quality += 1
-        end
-      end
+      update_quality
     end
   end
 
@@ -87,6 +63,12 @@ class NormalProduct < Product
 
   def reduce_age
     @item.sell_in -= 1
+  end
+
+  private
+
+  def under_max_quality?
+    @item.quality < 50
   end
 end
 
@@ -118,7 +100,9 @@ end
 
 class Brie < NormalProduct
   def update_quality
-    super
+    if under_max_quality?
+      @item.quality += 1
+    end
   end
 end
 
@@ -130,10 +114,43 @@ class LegendaryProduct < Product
   end
 end
 
-class ConcertTickets < NormalProduct
+class NormalDemand
+  def initialize(item)
+    @item = item
+  end
+
   def update_quality
+    @item.quality += 1
+  end
+end
+
+class ConcertTickets < NormalProduct
+  def update_quality demand: NormalDemand
     if expired?
       @item.quality = 0
+    elsif under_max_quality?
+      demand.new(@item).update_quality
+      add_demand_value
     end
+  end
+
+  private
+
+  # Probably should make this an object of Demand Pricing - HighDemand and RisingDemand
+  def add_demand_value
+    if getting_closer?
+      @item.quality += 1
+    end
+    if concert_imminent?
+      @item.quality += 1
+    end
+  end
+
+  def getting_closer?
+    @item.sell_in < 11
+  end
+
+  def concert_imminent?
+    @item.sell_in < 6
   end
 end
