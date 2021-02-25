@@ -82,12 +82,9 @@ class NormalProduct < Product
 end
 
 class ProductFactory
-
   def create(item)
     if !normal_item?(item)
       LegendaryProduct.new item
-    elsif conjured_item?(item)
-      ConjuredProduct.new item
     else
       create_normal_item(item)
     end
@@ -193,7 +190,4 @@ class ConcertTickets < NormalProduct
   def concert_imminent?
     @item.sell_in < 6
   end
-end
-
-class ConjuredProduct < NormalProduct
 end
