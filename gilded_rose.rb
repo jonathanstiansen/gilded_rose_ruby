@@ -1,7 +1,3 @@
-def normal_item?(item)
-  item.name != 'Sulfuras, Hand of Ragnaros'
-end
-
 def update_quality(items)
   items.each do |item|
     ProductFactory.new.create(item).age
@@ -84,9 +80,10 @@ class ProductFactory
   private
 
   def create_normal_item(item)
-    if item.name == 'Aged Brie'
+    case item.name
+    when 'Aged Brie'
       Brie.new item
-    elsif item.name == 'Backstage passes to a TAFKAL80ETC concert'
+    when 'Backstage passes to a TAFKAL80ETC concert'
       ConcertTickets.new item
     else
       NormalProduct.new item
@@ -125,7 +122,9 @@ class NormalDemand
 end
 
 class DemandFactory
-  def create(item) end
+  def create(item)
+    NormalDemand.new(item)
+  end
 end
 
 class ConcertTickets < NormalProduct
