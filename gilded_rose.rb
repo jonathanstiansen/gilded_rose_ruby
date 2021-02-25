@@ -103,7 +103,9 @@ class ProductFactory
 
   def create_normal_item(item)
     if item.name == 'Aged Brie'
-      BrieProduct.new item
+      Brie.new item
+    elsif item.name == 'Backstage passes to a TAFKAL80ETC concert'
+      ConcertTickets.new item
     else
       NormalProduct.new item
     end
@@ -114,7 +116,7 @@ class ProductFactory
   end
 end
 
-class BrieProduct < NormalProduct
+class Brie < NormalProduct
 
 end
 
@@ -124,4 +126,7 @@ class LegendaryProduct < Product
 
   def reduce_age
   end
+end
+
+class ConcertTickets < NormalProduct
 end
