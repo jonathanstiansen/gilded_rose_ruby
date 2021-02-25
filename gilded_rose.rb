@@ -62,19 +62,19 @@ class Product
   end
 
   def quality_after_expiration
-    if @item.sell_in.negative?
+    if expired?
       if @item.name != "Aged Brie"
-        if @item.name != 'Backstage passes to a TAFKAL80ETC concert'
-          update_quality
-        else
-          @item.quality = 0
-        end
+        update_quality
       else
         if @item.quality < 50
           @item.quality += 1
         end
       end
     end
+  end
+
+  def expired?
+    @item.sell_in.negative?
   end
 end
 
@@ -117,7 +117,9 @@ class ProductFactory
 end
 
 class Brie < NormalProduct
-
+  def update_quality
+    super
+  end
 end
 
 class LegendaryProduct < Product
@@ -129,4 +131,9 @@ class LegendaryProduct < Product
 end
 
 class ConcertTickets < NormalProduct
+  def update_quality
+    if expired?
+      @item.quality = 0
+    end
+  end
 end
